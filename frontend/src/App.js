@@ -1,24 +1,39 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { useEffect, useState } from 'react';
+import api from './service/api';
 import './App.css';
+import DevItem from './components/DevItem';
+import DevForm from './components/DevForm';
 
 function App() {
+  const [devs, setDevs] = useState([]);
+
+  useEffect(() => {
+    loadDevs();
+  }, []);
+
+  async function loadDevs() {
+    const response = await api.get('/dev');
+    setDevs(response.data);
+  }
+
+  async function onSubmit(data) {
+    await api.post('/dev', data);
+    loadDevs();
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div id="app">
+      <aside>
+        <strong>Cadastrar</strong>
+        <DevForm onSubmit={onSubmit} />
+      </aside>
+      <main>
+        <ul>
+          {devs.map(dev => (
+            <DevItem key={dev._id} dev={dev} />
+          ))}
+        </ul>
+      </main>
     </div>
   );
 }
